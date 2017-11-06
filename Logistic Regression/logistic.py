@@ -37,7 +37,7 @@ def evaluate(targets, y):
         frac_correct : (scalar) Fraction of inputs classified correctly.
     """
     # TODO: Finish this function
-    ce = -np.sum(targets * np.log(y))
+    ce = -np.sum(targets * np.log(1-y+1e-8))
     y = (y < 0.5)
     y = y.astype(int)
 
@@ -102,21 +102,21 @@ def logistic_pen(weights, data, targets, hyperparameters):
     """
 
     # TODO: Finish this function
-    mu = hyperparameters['mu']
+    mu = hyperparameters['weight decay']
 
     bias = np.expand_dims(weights[-1], axis=0)  # for concatenate
 
     if hyperparameters['weight_regularization']:
-        f = -np.sum(targets * np.log(1 - sigmoid(np.dot(data, weights[:-1]) + weights[-1])) + (1 - targets) * (
-        np.log(sigmoid(np.dot(data, weights[:-1]) + weights[-1])))) + mu * np.sum(
+        f = -np.sum(targets * np.log(1 - sigmoid(np.dot(data, weights[:-1]) + weights[-1])+1e-8) + (1 - targets) * (
+        np.log(sigmoid(np.dot(data, weights[:-1]) + weights[-1])+1e-8))) + mu * np.sum(
             np.dot(np.transpose(weights), weights))
         df = np.concatenate(
             (np.dot(np.transpose(data), targets - (sigmoid(-(np.dot(data, weights[:-1]) + weights[-1])))), bias),
             axis=0) - mu * weights
 
     else:
-        f = -np.sum(targets * np.log(1 - sigmoid(np.dot(data, weights[:-1]) + weights[-1])) + (1 - targets) * (
-        np.log(sigmoid(np.dot(data, weights[:-1]) + weights[-1]))))
+        f = -np.sum(targets * np.log(1 - sigmoid(np.dot(data, weights[:-1]) + weights[-1])+1e-8) + (1 - targets) * (
+        np.log(sigmoid(np.dot(data, weights[:-1]) + weights[-1])+1e-8)))
 
         df = np.concatenate(
             (np.dot(np.transpose(data), targets - (sigmoid(-(np.dot(data, weights[:-1]) + weights[-1])))), bias),

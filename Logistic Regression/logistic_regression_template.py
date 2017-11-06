@@ -23,7 +23,7 @@ def run_logistic_regression(hyperparameters):
 
     # Logistic regression weights
     # TODO:Initialize to random weights here.
-    weights = np.random.randn(M + 1, 1) / 1000
+    weights = np.random.randn(M + 1, 1) /10
 
     # Verify that your logistic function produces the right gradient.
     # diff should be very close to 0.
@@ -100,11 +100,11 @@ if __name__ == '__main__':
     hyperparameters = {
         'learning_rate': 0.01,
         'weight_regularization': True,  # boolean, True for using Gaussian prior on weights
-        'num_iterations': 10000,
-        'mu': 0.01,  # Regularization rate
+        'num_iterations': 20000,
+        'weight decay': 1,  # Regularization rate
         'train_small': False,    # boolean, True for using train small data
         'test': True,  # boolean, True for using Test data
-        'plot': False   # boolean, True for plotting error graph
+        'plot': True   # boolean, True for plotting error graph
     }
 
     # average over multiple runs
