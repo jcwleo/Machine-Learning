@@ -19,5 +19,11 @@ CE: Train 0.26958 Validation 0.96540 Test 0.80507
 Acc: Train 0.90427 Validation 0.73747 Test 0.77662
 
 ```
+* Accuracy
+```
 ![Accuarcy](readme/acc.png)
+```
+* Loss
+```
 ![Loss](readme/loss.png)
+```
