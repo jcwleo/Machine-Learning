@@ -20,10 +20,10 @@ Acc: Train 0.90427 Validation 0.73747 Test 0.77662
 
 ```
 * Accuracy
-```
+
 ![Accuarcy](readme/acc.png)
-```
+
 * Loss
-```
+
 ![Loss](readme/loss.png)
-```
+
