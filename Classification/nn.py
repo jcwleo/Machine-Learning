@@ -261,9 +261,9 @@ def Train(model, forward, backward, update, eps, momentum, num_epochs,
             train_ce = -np.sum(t * np.log(prediction)) / x.shape[0]
             train_acc = (np.argmax(prediction, axis=1) ==
                          np.argmax(t, axis=1)).astype('float').mean()
-            print(('Epoch {:3d} Step {:2d} Train CE {:.5f} '
-                   'Train Acc {:.5f}').format(
-                epoch, step, train_ce, train_acc))
+            #print(('Epoch {:3d} Step {:2d} Train CE {:.5f} '
+            #       'Train Acc {:.5f} Batch {:3f} momentum {:.2f} eps {:.4f}').format(
+            #    epoch, step, train_ce, train_acc,batch_size,momentum,eps))
 
             # Compute error.
             error = (prediction - t) / x.shape[0]
@@ -284,11 +284,11 @@ def Train(model, forward, backward, update, eps, momentum, num_epochs,
         train_acc_list.append((epoch, train_acc))
         valid_ce_list.append((epoch, valid_ce))
         valid_acc_list.append((epoch, valid_acc))
-        DisplayPlot(train_ce_list, valid_ce_list, 'Cross Entropy', number=0)
-        DisplayPlot(train_acc_list, valid_acc_list, 'Accuracy', number=1)
+        #DisplayPlot(train_ce_list, valid_ce_list, 'Cross Entropy', number=0)
+        #DisplayPlot(train_acc_list, valid_acc_list, 'Accuracy', number=1)
 
-    DisplayPlot(train_ce_list, valid_ce_list, 'Cross Entropy', number=0,final = True)
-    DisplayPlot(train_acc_list, valid_acc_list, 'Accuracy', number=1,final = True)
+    DisplayPlot(batch_size,eps,momentum,train_ce_list, valid_ce_list, 'Cross Entropy', number=0,final = True)
+    DisplayPlot(batch_size,eps,momentum,train_acc_list, valid_acc_list, 'Accuracy', number=1,final = True)
 
     print()
     train_ce, train_acc = Evaluate(
@@ -378,9 +378,9 @@ def main():
     stats_fname = 'nn_stats.npz'
 
     # Hyper-parameters. Modify them if needed.
-    num_hiddens = [16, 32]
-    eps = 0.01
-    momentum = 0.0
+    num_hiddens = [100, 100]
+    eps = [0.001]
+    momentum = [0.9]
     num_epochs = 1000
     batch_size = 100
 
@@ -405,8 +405,12 @@ def main():
     CheckGrad(model, NNForward, NNBackward, 'b1', x)
 
     # Train model.
-    stats = Train(model, NNForward, NNBackward, NNUpdate, eps,
-                  momentum, num_epochs, batch_size)
+    for m in momentum:
+        for lr in eps:
+            stats = Train(model, NNForward, NNBackward, NNUpdate, lr,
+                          m, num_epochs, batch_size)
+            # Initialize model.
+            model = InitNN(num_inputs, num_hiddens, num_outputs)
 
     # Uncomment if you wish to save the model.
     # Save(model_fname, model)
