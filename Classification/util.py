@@ -60,7 +60,7 @@ def Load(fname):
     return dict(np.load(fname))
 
 
-def DisplayPlot(batch,eps,momentum,train, valid, ylabel, number=0, final=False):
+def DisplayPlot(test_acc,num_hiddens,batch,eps,momentum,train, valid, ylabel, number=0, final=False):
     """Displays training curve.
 
     Args:
@@ -81,6 +81,6 @@ def DisplayPlot(batch,eps,momentum,train, valid, ylabel, number=0, final=False):
     plt.pause(0.0001)
     if final:
         if number == 0:
-            plt.savefig('graph/{}/{}_{}_{}.png'.format(str(batch),str(eps),str(momentum),'loss'))
+            plt.savefig('graph/hiddens/{}_loss.png'.format(str(num_hiddens)))
         else:
-            plt.savefig('graph/{}/{}_{}_{}.png'.format(str(batch),str(eps),str(momentum), 'acc'))
+            plt.savefig('graph/hiddens/{}_{}_acc.png'.format(str(num_hiddens),str(test_acc)))

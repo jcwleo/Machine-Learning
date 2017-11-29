@@ -213,7 +213,7 @@ def NNUpdate(model, eps, momentum):
 
 
 def Train(model, forward, backward, update, eps, momentum, num_epochs,
-          batch_size):
+          batch_size, num_hiddens):
     """Trains a simple MLP.
 
     Args:
@@ -284,11 +284,8 @@ def Train(model, forward, backward, update, eps, momentum, num_epochs,
         train_acc_list.append((epoch, train_acc))
         valid_ce_list.append((epoch, valid_ce))
         valid_acc_list.append((epoch, valid_acc))
-        #DisplayPlot(train_ce_list, valid_ce_list, 'Cross Entropy', number=0)
-        #DisplayPlot(train_acc_list, valid_acc_list, 'Accuracy', number=1)
 
-    DisplayPlot(batch_size,eps,momentum,train_ce_list, valid_ce_list, 'Cross Entropy', number=0,final = True)
-    DisplayPlot(batch_size,eps,momentum,train_acc_list, valid_acc_list, 'Accuracy', number=1,final = True)
+
 
     print()
     train_ce, train_acc = Evaluate(
@@ -301,6 +298,11 @@ def Train(model, forward, backward, update, eps, momentum, num_epochs,
           (train_ce, valid_ce, test_ce))
     print('Acc: Train {:.5f} Validation {:.5f} Test {:.5f}'.format(
         train_acc, valid_acc, test_acc))
+
+    DisplayPlot(test_acc,num_hiddens, batch_size, eps, momentum, train_ce_list, valid_ce_list, 'Cross Entropy', number=0,
+                final=True)
+    DisplayPlot(test_acc,num_hiddens, batch_size, eps, momentum, train_acc_list, valid_acc_list, 'Accuracy', number=1,
+                final=True)
 
     stats = {
         'train_ce': train_ce_list,
@@ -359,7 +361,7 @@ def CheckGrad(model, forward, backward, name, x):
     grad_w_2 = np.zeros(w_.shape)
     check_elem = np.arange(w_.size)
     np.random.shuffle(check_elem)
-    # Randomly check 20 elements.
+    # Randomly check 10 elements.
     check_elem = check_elem[:20]
     for ii in check_elem:
         w_[ii] += eps
@@ -378,45 +380,47 @@ def main():
     stats_fname = 'nn_stats.npz'
 
     # Hyper-parameters. Modify them if needed.
-    num_hiddens = [100, 100]
+    num_hiddens = [[3, 3],[20,20],[100,100]]
     eps = [0.001]
     momentum = [0.9]
     num_epochs = 1000
-    batch_size = 100
+    batch_size = [10]
 
     # Input-output dimensions.
     num_inputs = 2304
     num_outputs = 7
 
     # Initialize model.
-    model = InitNN(num_inputs, num_hiddens, num_outputs)
+    for hiddens in num_hiddens:
+        model = InitNN(num_inputs, hiddens, num_outputs)
 
-    # Uncomment to reload trained model here.
-    # model = Load(model_fname)
+        # Uncomment to reload trained model here.
+        # model = Load(model_fname)
 
-    # Check gradient implementation.
-    print('Checking gradients...')
-    x = np.random.rand(10, 48 * 48) * 0.1
-    CheckGrad(model, NNForward, NNBackward, 'W3', x)
-    CheckGrad(model, NNForward, NNBackward, 'b3', x)
-    CheckGrad(model, NNForward, NNBackward, 'W2', x)
-    CheckGrad(model, NNForward, NNBackward, 'b2', x)
-    CheckGrad(model, NNForward, NNBackward, 'W1', x)
-    CheckGrad(model, NNForward, NNBackward, 'b1', x)
+        # Check gradient implementation.
+        print('Checking gradients...')
+        x = np.random.rand(10, 48 * 48) * 0.1
+        CheckGrad(model, NNForward, NNBackward, 'W3', x)
+        CheckGrad(model, NNForward, NNBackward, 'b3', x)
+        CheckGrad(model, NNForward, NNBackward, 'W2', x)
+        CheckGrad(model, NNForward, NNBackward, 'b2', x)
+        CheckGrad(model, NNForward, NNBackward, 'W1', x)
+        CheckGrad(model, NNForward, NNBackward, 'b1', x)
 
-    # Train model.
-    for m in momentum:
-        for lr in eps:
-            stats = Train(model, NNForward, NNBackward, NNUpdate, lr,
-                          m, num_epochs, batch_size)
-            # Initialize model.
-            model = InitNN(num_inputs, num_hiddens, num_outputs)
+        # Train model.
+        for batch in batch_size:
+            for m in momentum:
+                for lr in eps:
+                    stats = Train(model, NNForward, NNBackward, NNUpdate, lr,
+                                  m, num_epochs, batch,hiddens)
+                    # Initialize model.
+                    model = InitNN(num_inputs, hiddens, num_outputs)
 
-    # Uncomment if you wish to save the model.
-    # Save(model_fname, model)
+        # Uncomment if you wish to save the model.
+        # Save(model_fname, model)
 
-    # Uncomment if you wish to save the training statistics.
-    # Save(stats_fname, stats)
+        # Uncomment if you wish to save the training statistics.
+        # Save(stats_fname, stats)
 
 
 if __name__ == '__main__':
